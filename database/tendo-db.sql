@@ -1,70 +1,96 @@
-/* Version 1.0 */
+/* 
+ * Version 1.0 
+ * Initial sql script
+ * Also resets the database
+ * WARNING: all data will be lost!
+*/
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE "user" (
+CREATE TYPE  "FriendshipStatus" AS ENUM ('pending', 'active', 'rejected', 'unfriend');
+CREATE TYPE  "MatchStatus" AS ENUM ('scheduled', 'ongoing', 'completed', 'canceled');
+CREATE TYPE  "TournamentStatus" AS ENUM ('scheduled', 'ongoing', 'completed', 'canceled');
+CREATE TYPE  "TournamentParticipantStatus" AS ENUM ( 'active', 'eliminated');
+CREATE TYPE  "Role" AS ENUM ( 'captain', 'member');
+
+
+DROP TABLE "User" CASCADE;
+DROP TABLE "UserMessage" CASCADE;
+DROP TABLE "UserSport" CASCADE;
+DROP TABLE "Sport" CASCADE;
+DROP TABLE "UserFriend" CASCADE;
+DROP TABLE "UserPost" CASCADE;
+DROP TABLE "Team" CASCADE;
+DROP TABLE "TeamMember" CASCADE;
+DROP TABLE "Match" CASCADE;
+DROP TABLE "Tournament" CASCADE;
+DROP TABLE "TournamentParticipant" CASCADE;
+DROP TABLE "TournamentRound" CASCADE;
+
+CREATE TABLE "User" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "username" varchar UNIQUE NOT NULL,
-  "password_hash" text NOT NULL,
-  "first_name" varchar NOT NULL,
-  "last_name" varchar NOT NULL,
-  "email" varchar NOT NULL,
-  "location" varchar NOT NULL,
+  "username" varchar(15) UNIQUE NOT NULL,
+  "passwordHash" text NOT NULL,
+  "firstName" varchar(50) NOT NULL,
+  "lastName" varchar(50) NOT NULL,
+  "email" varchar(100) NOT NULL,
+  "location" varchar(35) NOT NULL,
   "intro" varchar(200),
   "age" int NOT NULL,
   "height" int,
   "weight" int,
-  "profile_image_path" varchar,
+  "profileImagePath" varchar(255),
   "games" int NOT NULL,
   "wins" int NOT NULL,
   "loses" int NOT NULL,
   "elo" int,
-  "last_login" timestamp,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "lastLogin" timestamp,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "user_message" (
+CREATE TABLE "UserMessage" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "source_id" uuid NOT NULL,
-  "target_id" uuid NOT NULL,
+  "sourceId" uuid NOT NULL,
+  "targetId" uuid NOT NULL,
   "message" text NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "user_sport" (
+CREATE TABLE "UserSport" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "user_id" uuid NOT NULL,
-  "sport_id" uuid NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "userId" uuid NOT NULL,
+  "sportId" uuid NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "sport" (
+CREATE TABLE "Sport" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "name" varchar NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "name" varchar(35) NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "user_friend" (
+CREATE TABLE "UserFriend" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "source_id" uuid NOT NULL,
-  "target_id" uuid NOT NULL,
-  "status" varchar NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "sourceId" uuid NOT NULL,
+  "targetId" uuid NOT NULL,
+  "status" "FriendshipStatus"  NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "user_post" (
+CREATE TABLE "UserPost" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "source_id" uuid NOT NULL,
+  "sourceId" uuid NOT NULL,
   "content" varchar(120) NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "team" (
+CREATE TABLE "Team" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   "name" varchar,
   "location" varchar,
@@ -72,86 +98,105 @@ CREATE TABLE "team" (
   "wins" int,
   "loses" int,
   "elo" int,
-  "created_by" uuid NOT NULL,
-  "updated_by" uuid NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "createdBy" uuid NOT NULL,
+  "updatedBy" uuid NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "team_member" (
+CREATE TABLE "TeamMember" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "team_id" uuid NOT NULL,
-  "user_id" uuid NOT NULL,
-  "role" varchar NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "teamId" uuid NOT NULL,
+  "userId" uuid NOT NULL,
+  "role" "Role" NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "match" (
+CREATE TABLE "Match" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "home_team_id" uuid NOT NULL,
-  "away_team_id" uuid NOT NULL,
-  "mvp" uuid NOT NULL,
-  "status" varchar NOT NULL,
+  "teamAId" uuid NOT NULL,
+  "teamBId" uuid NOT NULL,
+  "mvpId" uuid NOT NULL,
+  "status" "MatchStatus" NOT NULL,
   "datetime" timestamp NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "tournament" (
+CREATE TABLE "Tournament" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "status" varchar NOT NULL,
-  "created_by" uuid NOT NULL,
-  "updated_by" uuid NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "isOpen" boolean NOT NULL,
+  "status" "TournamentStatus" NOT NULL,
+  "maxUsers" int NOT NULL,
+  "registrationStart" timestamp NOT NULL,
+  "registrationEnd" timestamp NOT NULL,
+  "createdBy" uuid NOT NULL,
+  "updatedBy" uuid NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-CREATE TABLE "tournament_participant" (
+CREATE TABLE "TournamentParticipant" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
-  "tournament_id" uuid NOT NULL,
-  "team_id" uuid NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL
+  "tournamentId" uuid NOT NULL,
+  "teamId" uuid NOT NULL,
+  "position" int,
+  "status" "TournamentParticipantStatus" NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
 );
 
-ALTER TABLE "user_message" ADD FOREIGN KEY ("source_id") REFERENCES "user" ("id");
+CREATE TABLE "TournamentRound" (
+  "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
+  "tournamentId" uuid NOT NULL,
+  "matchId" uuid NOT NULL,
+  "createdAt" timestamp NOT NULL,
+  "updatedAt" timestamp NOT NULL
+);
 
-ALTER TABLE "user_message" ADD FOREIGN KEY ("target_id") REFERENCES "user" ("id");
+ALTER TABLE "UserMessage" ADD FOREIGN KEY ("sourceId") REFERENCES "User" ("id");
 
-ALTER TABLE "user_sport" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+ALTER TABLE "UserMessage" ADD FOREIGN KEY ("targetId") REFERENCES "User" ("id");
 
-ALTER TABLE "user_sport" ADD FOREIGN KEY ("sport_id") REFERENCES "sport" ("id");
+ALTER TABLE "UserSport" ADD FOREIGN KEY ("userId") REFERENCES "User" ("id");
 
-ALTER TABLE "user_friend" ADD FOREIGN KEY ("source_id") REFERENCES "user" ("id");
+ALTER TABLE "UserSport" ADD FOREIGN KEY ("sportId") REFERENCES "Sport" ("id");
 
-ALTER TABLE "user_friend" ADD FOREIGN KEY ("target_id") REFERENCES "user" ("id");
+ALTER TABLE "UserFriend" ADD FOREIGN KEY ("sourceId") REFERENCES "User" ("id");
 
-ALTER TABLE "user_post" ADD FOREIGN KEY ("source_id") REFERENCES "user" ("id");
+ALTER TABLE "UserFriend" ADD FOREIGN KEY ("targetId") REFERENCES "User" ("id");
 
-ALTER TABLE "team" ADD FOREIGN KEY ("created_by") REFERENCES "user" ("id");
+ALTER TABLE "UserPost" ADD FOREIGN KEY ("sourceId") REFERENCES "User" ("id");
 
-ALTER TABLE "team" ADD FOREIGN KEY ("updated_by") REFERENCES "user" ("id");
+ALTER TABLE "Team" ADD FOREIGN KEY ("createdBy") REFERENCES "User" ("id");
 
-ALTER TABLE "team_member" ADD FOREIGN KEY ("team_id") REFERENCES "team" ("id");
+ALTER TABLE "Team" ADD FOREIGN KEY ("updatedBy") REFERENCES "User" ("id");
 
-ALTER TABLE "team_member" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+ALTER TABLE "TeamMember" ADD FOREIGN KEY ("teamId") REFERENCES "Team" ("id");
 
-ALTER TABLE "match" ADD FOREIGN KEY ("home_team_id") REFERENCES "team" ("id");
+ALTER TABLE "TeamMember" ADD FOREIGN KEY ("userId") REFERENCES "User" ("id");
 
-ALTER TABLE "match" ADD FOREIGN KEY ("away_team_id") REFERENCES "team" ("id");
+ALTER TABLE "Match" ADD FOREIGN KEY ("teamAId") REFERENCES "Team" ("id");
 
-ALTER TABLE "match" ADD FOREIGN KEY ("mvp") REFERENCES "user" ("id");
+ALTER TABLE "Match" ADD FOREIGN KEY ("teamBId") REFERENCES "Team" ("id");
 
-ALTER TABLE "tournament" ADD FOREIGN KEY ("created_by") REFERENCES "user" ("id");
+ALTER TABLE "Match" ADD FOREIGN KEY ("mvpId") REFERENCES "User" ("id");
 
-ALTER TABLE "tournament" ADD FOREIGN KEY ("updated_by") REFERENCES "user" ("id");
+ALTER TABLE "Tournament" ADD FOREIGN KEY ("createdBy") REFERENCES "User" ("id");
 
-ALTER TABLE "tournament_participant" ADD FOREIGN KEY ("tournament_id") REFERENCES "tournament" ("id");
+ALTER TABLE "Tournament" ADD FOREIGN KEY ("updatedBy") REFERENCES "User" ("id");
 
-ALTER TABLE "tournament_participant" ADD FOREIGN KEY ("team_id") REFERENCES "team" ("id");
+ALTER TABLE "TournamentParticipant" ADD FOREIGN KEY ("tournamentId") REFERENCES "Tournament" ("id");
 
+ALTER TABLE "TournamentParticipant" ADD FOREIGN KEY ("teamId") REFERENCES "Team" ("id");
 
-INSERT INTO "user"(username, password_hash, first_name, last_name, email, location, intro, age, height, weight, profile_image_path, games, wins, loses, elo, last_login, created_at, updated_at)
+ALTER TABLE "TournamentRound" ADD FOREIGN KEY ("tournamentId") REFERENCES "Tournament" ("id");
+
+ALTER TABLE "TournamentRound" ADD FOREIGN KEY ("matchId") REFERENCES "Match" ("id");
+
+-- User records
+INSERT INTO "User"(username, "passwordHash", "firstName", "lastName", email, location, intro, age, height, weight, "profileImagePath", games, wins, loses, elo, "lastLogin", "createdAt", "updatedAt")
 VALUES ('chon', 'password', 'Balint', 'Ducsai', 'gorgeousemail@gmail.com', 'Budapest', 'Intro', 24, 180, 77, null, 0, 0, 0, 0, '2022-01-11', '2022-01-11', '2022-01-11');
+INSERT INTO "User"(username, "passwordHash", "firstName", "lastName", email, location, intro, age, height, weight, "profileImagePath", games, wins, loses, elo, "lastLogin", "createdAt", "updatedAt")
 VALUES ('admin', 'password', 'Balint', 'Ducsai', 'gorgeousemail@gmail.com', 'Budapest', 'Intro', 24, 180, 77, null, 0, 0, 0, 0, '2022-01-11', '2022-01-11', '2022-01-11');

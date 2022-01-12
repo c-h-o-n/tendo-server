@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,203 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Match {
+  id                       String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  teamAId                  String            @db.Uuid
+  teamBId                  String            @db.Uuid
+  mvpId                    String            @db.Uuid
+  status                   MatchStatus
+  datetime                 DateTime          @db.Timestamp(6)
+  createdAt                DateTime          @db.Timestamp(6)
+  updatedAt                DateTime          @db.Timestamp(6)
+  User                     User              @relation(fields: [mvpId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team_Match_teamAIdToTeam Team              @relation("Match_teamAIdToTeam", fields: [teamAId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team_Match_teamBIdToTeam Team              @relation("Match_teamBIdToTeam", fields: [teamBId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  TournamentRound          TournamentRound[]
+}
+
+model Sport {
+  id        String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String      @db.VarChar(35)
+  createdAt DateTime    @db.Timestamp(6)
+  updatedAt DateTime    @db.Timestamp(6)
+  UserSport UserSport[]
+}
+
+model Team {
+  id                        String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                      String?                 @db.VarChar
+  location                  String?                 @db.VarChar
+  games                     Int?
+  wins                      Int?
+  loses                     Int?
+  elo                       Int?
+  createdBy                 String                  @db.Uuid
+  updatedBy                 String                  @db.Uuid
+  createdAt                 DateTime                @db.Timestamp(6)
+  updatedAt                 DateTime                @db.Timestamp(6)
+  User_Team_createdByToUser User                    @relation("Team_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_Team_updatedByToUser User                    @relation("Team_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Match_Match_teamAIdToTeam Match[]                 @relation("Match_teamAIdToTeam")
+  Match_Match_teamBIdToTeam Match[]                 @relation("Match_teamBIdToTeam")
+  TeamMember                TeamMember[]
+  TournamentParticipant     TournamentParticipant[]
+}
+
+model TeamMember {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  teamId    String   @db.Uuid
+  userId    String   @db.Uuid
+  role      Role
+  createdAt DateTime @db.Timestamp(6)
+  updatedAt DateTime @db.Timestamp(6)
+  Team      Team     @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Tournament {
+  id                              String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  isOpen                          Boolean
+  status                          TournamentStatus
+  maxUsers                        Int
+  registrationStart               DateTime                @db.Timestamp(6)
+  registrationEnd                 DateTime                @db.Timestamp(6)
+  createdBy                       String                  @db.Uuid
+  updatedBy                       String                  @db.Uuid
+  createdAt                       DateTime                @db.Timestamp(6)
+  updatedAt                       DateTime                @db.Timestamp(6)
+  User_Tournament_createdByToUser User                    @relation("Tournament_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_Tournament_updatedByToUser User                    @relation("Tournament_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  TournamentParticipant           TournamentParticipant[]
+  TournamentRound                 TournamentRound[]
+}
+
+model TournamentParticipant {
+  id           String                      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tournamentId String                      @db.Uuid
+  teamId       String                      @db.Uuid
+  position     Int?
+  status       TournamentParticipantStatus
+  createdAt    DateTime                    @db.Timestamp(6)
+  updatedAt    DateTime                    @db.Timestamp(6)
+  Team         Team                        @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Tournament   Tournament                  @relation(fields: [tournamentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id                                     String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username                               String        @unique @db.VarChar(15)
+  passwordHash                           String
+  firstName                              String        @db.VarChar(50)
+  lastName                               String        @db.VarChar(50)
+  email                                  String        @db.VarChar(100)
+  location                               String        @db.VarChar(35)
+  intro                                  String?       @db.VarChar(200)
+  age                                    Int
+  height                                 Int?
+  weight                                 Int?
+  profileImagePath                       String?       @db.VarChar(255)
+  games                                  Int
+  wins                                   Int
+  loses                                  Int
+  elo                                    Int?
+  lastLogin                              DateTime?     @db.Timestamp(6)
+  createdAt                              DateTime      @db.Timestamp(6)
+  updatedAt                              DateTime      @db.Timestamp(6)
+  Match                                  Match[]
+  Team_Team_createdByToUser              Team[]        @relation("Team_createdByToUser")
+  Team_Team_updatedByToUser              Team[]        @relation("Team_updatedByToUser")
+  TeamMember                             TeamMember[]
+  Tournament_Tournament_createdByToUser  Tournament[]  @relation("Tournament_createdByToUser")
+  Tournament_Tournament_updatedByToUser  Tournament[]  @relation("Tournament_updatedByToUser")
+  UserFriend_UserToUserFriend_sourceId   UserFriend[]  @relation("UserToUserFriend_sourceId")
+  UserFriend_UserToUserFriend_targetId   UserFriend[]  @relation("UserToUserFriend_targetId")
+  UserMessage_UserToUserMessage_sourceId UserMessage[] @relation("UserToUserMessage_sourceId")
+  UserMessage_UserToUserMessage_targetId UserMessage[] @relation("UserToUserMessage_targetId")
+  UserPost                               UserPost[]
+  UserSport                              UserSport[]
+}
+
+model UserFriend {
+  id                             String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sourceId                       String           @db.Uuid
+  targetId                       String           @db.Uuid
+  status                         FriendshipStatus
+  createdAt                      DateTime         @db.Timestamp(6)
+  updatedAt                      DateTime         @db.Timestamp(6)
+  User_UserToUserFriend_sourceId User             @relation("UserToUserFriend_sourceId", fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_UserToUserFriend_targetId User             @relation("UserToUserFriend_targetId", fields: [targetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model UserMessage {
+  id                              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sourceId                        String   @db.Uuid
+  targetId                        String   @db.Uuid
+  message                         String
+  createdAt                       DateTime @db.Timestamp(6)
+  updatedAt                       DateTime @db.Timestamp(6)
+  User_UserToUserMessage_sourceId User     @relation("UserToUserMessage_sourceId", fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_UserToUserMessage_targetId User     @relation("UserToUserMessage_targetId", fields: [targetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model UserPost {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sourceId  String   @db.Uuid
+  content   String   @db.VarChar(120)
+  createdAt DateTime @db.Timestamp(6)
+  updatedAt DateTime @db.Timestamp(6)
+  User      User     @relation(fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model UserSport {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String   @db.Uuid
+  sportId   String   @db.Uuid
+  createdAt DateTime @db.Timestamp(6)
+  updatedAt DateTime @db.Timestamp(6)
+  Sport     Sport    @relation(fields: [sportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model TournamentRound {
+  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tournamentId String     @db.Uuid
+  matchId      String     @db.Uuid
+  createdAt    DateTime   @db.Timestamp(6)
+  updatedAt    DateTime   @db.Timestamp(6)
+  Match        Match      @relation(fields: [matchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum Role {
+  captain
+  member
+}
+
+enum FriendshipStatus {
+  pending
+  active
+  rejected
+  unfriend
+}
+
+enum MatchStatus {
+  scheduled
+  ongoing
+  completed
+  canceled
+}
+
+enum TournamentParticipantStatus {
+  active
+  eliminated
+}
+
+enum TournamentStatus {
+  scheduled
+  ongoing
+  completed
+  canceled
 }
