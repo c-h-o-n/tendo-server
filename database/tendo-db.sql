@@ -45,7 +45,7 @@ CREATE TABLE "User" (
   "loses" int NOT NULL,
   "elo" int,
   "lastLogin" timestamp,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -54,7 +54,7 @@ CREATE TABLE "UserMessage" (
   "sourceId" uuid NOT NULL,
   "targetId" uuid NOT NULL,
   "message" text NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -62,14 +62,14 @@ CREATE TABLE "UserSport" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   "userId" uuid NOT NULL,
   "sportId" uuid NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
 CREATE TABLE "Sport" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   "name" varchar(35) NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -78,7 +78,7 @@ CREATE TABLE "UserFriend" (
   "sourceId" uuid NOT NULL,
   "targetId" uuid NOT NULL,
   "status" "FriendshipStatus"  NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -86,7 +86,7 @@ CREATE TABLE "UserPost" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   "sourceId" uuid NOT NULL,
   "content" varchar(120) NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -100,7 +100,7 @@ CREATE TABLE "Team" (
   "elo" int,
   "createdBy" uuid NOT NULL,
   "updatedBy" uuid NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -109,7 +109,7 @@ CREATE TABLE "TeamMember" (
   "teamId" uuid NOT NULL,
   "userId" uuid NOT NULL,
   "role" "Role" NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -120,7 +120,7 @@ CREATE TABLE "Match" (
   "mvpId" uuid NOT NULL,
   "status" "MatchStatus" NOT NULL,
   "datetime" timestamp NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -133,7 +133,7 @@ CREATE TABLE "Tournament" (
   "registrationEnd" timestamp NOT NULL,
   "createdBy" uuid NOT NULL,
   "updatedBy" uuid NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -143,7 +143,7 @@ CREATE TABLE "TournamentParticipant" (
   "teamId" uuid NOT NULL,
   "position" int,
   "status" "TournamentParticipantStatus" NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
@@ -151,7 +151,7 @@ CREATE TABLE "TournamentRound" (
   "id" uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
   "tournamentId" uuid NOT NULL,
   "matchId" uuid NOT NULL,
-  "createdAt" timestamp NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp NOT NULL
 );
 
