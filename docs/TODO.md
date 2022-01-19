@@ -1,0 +1,2 @@
+- [] Config file instead of process.env
+- [**x**] payload type for auth
