@@ -9,16 +9,17 @@ import { PasswordService } from './password.service';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
+import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({}),
     JwtModule.registerAsync({
       useFactory: async (config: ConfigService) => {
         return {
-          secret: config.get<string>('jwt.secret'),
+          secret: config.get<string>('jwt.accessSecret'),
           signOptions: {
-            expiresIn: '60s',
+            expiresIn: '5s',
           },
         };
       },
@@ -30,6 +31,7 @@ import { ConfigService } from '@nestjs/config';
     PasswordService,
     LocalStrategy,
     JwtStrategy,
+    JwtRefreshStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   controllers: [AuthController],
