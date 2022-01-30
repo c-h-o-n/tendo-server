@@ -1,5 +1,0 @@
-- [x] Config file instead of process.env
-- [x] Refresh token
-- [x] Register
-- TODO folder structure
-- TODO user service

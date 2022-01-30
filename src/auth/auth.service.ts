@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password.service';
 
 @Injectable()
@@ -11,20 +12,16 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private userService: UserService,
     private passwordService: PasswordService,
     private config: ConfigService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { username: username },
-    });
+    const user = await this.userService.getUserByUsername(username);
 
     if (user) {
-      const isPasswordValid = await this.passwordService.validatePassword(
-        password,
-        user.passwordHash,
-      );
+      const isPasswordValid = await this.passwordService.validatePassword(password, user.passwordHash);
 
       if (isPasswordValid) {
         return user;
@@ -79,8 +76,8 @@ export class AuthService {
 
   getRefreshToken(payload: any): string {
     return this.jwtService.sign(payload, {
-      secret: this.config.get('jwt.refreshSecret'),
-      expiresIn: '2days',
+      secret: this.config.get('jwt.refresh.secret'),
+      expiresIn: this.config.get('jwt.refresh.expiresIn'),
     });
   }
 

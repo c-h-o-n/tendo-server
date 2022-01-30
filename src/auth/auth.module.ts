@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -17,9 +18,9 @@ import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
     JwtModule.registerAsync({
       useFactory: async (config: ConfigService) => {
         return {
-          secret: config.get<string>('jwt.accessSecret'),
+          secret: config.get<string>('jwt.access.secret'),
           signOptions: {
-            expiresIn: '5s',
+            expiresIn: config.get<string | number>('jwt.access.expiresIn'),
           },
         };
       },
@@ -33,6 +34,7 @@ import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
     JwtStrategy,
     JwtRefreshStrategy,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    UserService,
   ],
   controllers: [AuthController],
 })
