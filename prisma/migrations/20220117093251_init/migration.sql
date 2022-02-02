@@ -1,3 +1,6 @@
+-- Get uuid extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- CreateEnum
 CREATE TYPE "FriendshipStatus" AS ENUM ('pending', 'active', 'rejected', 'unfriend');
 

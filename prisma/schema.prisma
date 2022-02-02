@@ -1,3 +1,4 @@
+// TODO remove games from users => calculate on backend
 generator client {
   provider = "prisma-client-js"
 }
@@ -112,7 +113,7 @@ model User {
   age                                    Int
   height                                 Int?
   weight                                 Int?
-  profileImagePath                       String?       @db.VarChar(255)
+  image                                  Bytes?        @db.ByteA
   games                                  Int
   wins                                   Int
   loses                                  Int
