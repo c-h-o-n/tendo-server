@@ -1,4 +1,3 @@
-// TODO remove games from users => calculate on backend
 generator client {
   provider = "prisma-client-js"
 }
@@ -35,7 +34,6 @@ model Team {
   id                        String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                      String?                 @db.VarChar
   location                  String?                 @db.VarChar
-  games                     Int?
   wins                      Int?
   loses                     Int?
   elo                       Int?
@@ -114,7 +112,6 @@ model User {
   height                                 Int?
   weight                                 Int?
   image                                  Bytes?        @db.ByteA
-  games                                  Int
   wins                                   Int
   loses                                  Int
   elo                                    Int?

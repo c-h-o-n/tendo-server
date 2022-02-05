@@ -51,7 +51,6 @@ export class AuthService {
         lastName: body.lastName,
         email: body.email,
         age: body.age,
-        games: 0,
         wins: 0,
         loses: 0,
         location: body.location,
