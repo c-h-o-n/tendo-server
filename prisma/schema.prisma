@@ -1,3 +1,5 @@
+// TODO cascade delete on user, team, teammember .. setNull
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,16 +11,16 @@ datasource db {
 
 model Match {
   id                       String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  teamAId                  String            @db.Uuid
-  teamBId                  String            @db.Uuid
-  mvpId                    String            @db.Uuid
+  teamAId                  String?           @db.Uuid
+  teamBId                  String?           @db.Uuid
+  mvpId                    String?           @db.Uuid
   status                   MatchStatus
   datetime                 DateTime          @db.Timestamp(6)
   createdAt                DateTime          @default(now()) @db.Timestamp(6)
   updatedAt                DateTime          @db.Timestamp(6)
-  User                     User              @relation(fields: [mvpId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Team_Match_teamAIdToTeam Team              @relation("Match_teamAIdToTeam", fields: [teamAId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Team_Match_teamBIdToTeam Team              @relation("Match_teamBIdToTeam", fields: [teamBId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User                     User?             @relation(fields: [mvpId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  Team_Match_teamAIdToTeam Team?             @relation("Match_teamAIdToTeam", fields: [teamAId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  Team_Match_teamBIdToTeam Team?             @relation("Match_teamBIdToTeam", fields: [teamBId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   TournamentRound          TournamentRound[]
 }
 
@@ -33,20 +35,22 @@ model Sport {
 model Team {
   id                        String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                      String?                 @db.VarChar
-  location                  String?                 @db.VarChar
-  wins                      Int?
-  loses                     Int?
+  location                  String                  @db.VarChar
+  wins                      Int                     @default(0)
+  loses                     Int                     @default(0)
   elo                       Int?
-  createdBy                 String                  @db.Uuid
-  updatedBy                 String                  @db.Uuid
+  createdBy                 String?                 @db.Uuid
+  updatedBy                 String?                 @db.Uuid
   createdAt                 DateTime                @default(now()) @db.Timestamp(6)
   updatedAt                 DateTime                @db.Timestamp(6)
-  User_Team_createdByToUser User                    @relation("Team_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User_Team_updatedByToUser User                    @relation("Team_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_Team_createdByToUser User?                   @relation("Team_createdByToUser", fields: [createdBy], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  User_Team_updatedByToUser User?                   @relation("Team_updatedByToUser", fields: [updatedBy], references: [id], onDelete: SetNull, onUpdate: NoAction)
   Match_Match_teamAIdToTeam Match[]                 @relation("Match_teamAIdToTeam")
   Match_Match_teamBIdToTeam Match[]                 @relation("Match_teamBIdToTeam")
   TeamMember                TeamMember[]
   TournamentParticipant     TournamentParticipant[]
+
+  @@unique([name, location])
 }
 
 model TeamMember {
@@ -56,8 +60,8 @@ model TeamMember {
   role      Role
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @db.Timestamp(6)
-  Team      Team     @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model Tournament {
@@ -67,12 +71,12 @@ model Tournament {
   maxUsers                        Int
   registrationStart               DateTime                @db.Timestamp(6)
   registrationEnd                 DateTime                @db.Timestamp(6)
-  createdBy                       String                  @db.Uuid
-  updatedBy                       String                  @db.Uuid
+  createdBy                       String?                 @db.Uuid
+  updatedBy                       String?                 @db.Uuid
   createdAt                       DateTime                @default(now()) @db.Timestamp(6)
   updatedAt                       DateTime                @db.Timestamp(6)
-  User_Tournament_createdByToUser User                    @relation("Tournament_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User_Tournament_updatedByToUser User                    @relation("Tournament_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_Tournament_createdByToUser User?                   @relation("Tournament_createdByToUser", fields: [createdBy], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  User_Tournament_updatedByToUser User?                   @relation("Tournament_updatedByToUser", fields: [updatedBy], references: [id], onDelete: SetNull, onUpdate: NoAction)
   TournamentParticipant           TournamentParticipant[]
   TournamentRound                 TournamentRound[]
 }
@@ -80,12 +84,12 @@ model Tournament {
 model TournamentParticipant {
   id           String                      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   tournamentId String                      @db.Uuid
-  teamId       String                      @db.Uuid
+  teamId       String?                     @db.Uuid
   position     Int?
   status       TournamentParticipantStatus
   createdAt    DateTime                    @default(now()) @db.Timestamp(6)
   updatedAt    DateTime                    @db.Timestamp(6)
-  Team         Team                        @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team         Team?                       @relation(fields: [teamId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   Tournament   Tournament                  @relation(fields: [tournamentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -108,16 +112,16 @@ model User {
   email                                  String        @db.VarChar(100)
   location                               String        @db.VarChar(35)
   intro                                  String?       @db.VarChar(200)
-  age                                    Int
   height                                 Int?
   weight                                 Int?
-  image                                  Bytes?        @db.ByteA
-  wins                                   Int
-  loses                                  Int
+  wins                                   Int           @default(0)
+  loses                                  Int           @default(0)
   elo                                    Int?
   lastLogin                              DateTime?     @db.Timestamp(6)
   createdAt                              DateTime      @default(now()) @db.Timestamp(6)
   updatedAt                              DateTime      @db.Timestamp(6)
+  image                                  Bytes?
+  birthDate                              DateTime      @db.Date
   Match                                  Match[]
   Team_Team_createdByToUser              Team[]        @relation("Team_createdByToUser")
   Team_Team_updatedByToUser              Team[]        @relation("Team_updatedByToUser")
@@ -139,8 +143,8 @@ model UserFriend {
   status                         FriendshipStatus
   createdAt                      DateTime         @default(now()) @db.Timestamp(6)
   updatedAt                      DateTime         @db.Timestamp(6)
-  User_UserToUserFriend_sourceId User             @relation("UserToUserFriend_sourceId", fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User_UserToUserFriend_targetId User             @relation("UserToUserFriend_targetId", fields: [targetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_UserToUserFriend_sourceId User             @relation("UserToUserFriend_sourceId", fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User_UserToUserFriend_targetId User             @relation("UserToUserFriend_targetId", fields: [targetId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model UserMessage {
@@ -150,8 +154,8 @@ model UserMessage {
   message                         String
   createdAt                       DateTime @default(now()) @db.Timestamp(6)
   updatedAt                       DateTime @db.Timestamp(6)
-  User_UserToUserMessage_sourceId User     @relation("UserToUserMessage_sourceId", fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User_UserToUserMessage_targetId User     @relation("UserToUserMessage_targetId", fields: [targetId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User_UserToUserMessage_sourceId User     @relation("UserToUserMessage_sourceId", fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User_UserToUserMessage_targetId User     @relation("UserToUserMessage_targetId", fields: [targetId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model UserPost {
@@ -160,7 +164,7 @@ model UserPost {
   content   String   @db.VarChar(120)
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @db.Timestamp(6)
-  User      User     @relation(fields: [sourceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User      User     @relation(fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model UserSport {
@@ -170,7 +174,7 @@ model UserSport {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @db.Timestamp(6)
   Sport     Sport    @relation(fields: [sportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum FriendshipStatus {
