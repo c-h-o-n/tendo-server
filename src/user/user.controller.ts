@@ -9,4 +9,9 @@ export class UserController {
   getUser(@Param('username') username) {
     return this.userService.getUserByUsername(username);
   }
+
+  @Get(':id/teams')
+  getTeamsByUserId(@Param('id') id: string) {
+    return this.userService.getUsersTeams(id);
+  }
 }

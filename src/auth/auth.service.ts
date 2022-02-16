@@ -5,6 +5,7 @@ import { User } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { SignUpDto } from './dto/sign-up.dto';
 import { PasswordService } from './password.service';
 
 @Injectable()
@@ -17,8 +18,8 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User> {
-    const user = await this.userService.getUserByUsername(username);
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.getUserCredentials(username);
 
     if (user) {
       const isPasswordValid = await this.passwordService.validatePassword(password, user.passwordHash);
@@ -31,7 +32,20 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any): Promise<any> {
+  async getUserCredentials(username: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+      select: {
+        id: true,
+        username: true,
+        passwordHash: true,
+      },
+    });
+  }
+
+  async signin(user: any): Promise<any> {
     const payload = { username: user.username, sub: user.id };
 
     return {
@@ -40,7 +54,7 @@ export class AuthService {
     };
   }
 
-  async register(body: any): Promise<any> {
+  async signup(body: SignUpDto): Promise<User> {
     const passwordHash = await this.passwordService.hashPassword(body.password);
 
     return await this.prisma.user.create({
@@ -50,9 +64,7 @@ export class AuthService {
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
-        age: body.age,
-        wins: 0,
-        loses: 0,
+        birthDate: new Date(1997, 12, 13),
         location: body.location,
         updatedAt: new Date(),
       },
@@ -80,7 +92,8 @@ export class AuthService {
     });
   }
 
-  async logout(req: Request): Promise<any> {
+  // TODO implement logout
+  async signout(req: Request): Promise<any> {
     return { logout: req.user };
   }
 }

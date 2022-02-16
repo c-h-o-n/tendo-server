@@ -1,5 +1,4 @@
-// TODO cascade delete on user, team, teammember .. setNull
-
+// TODO make updateAt automaticly up-to-date by triggers
 generator client {
   provider = "prisma-client-js"
 }

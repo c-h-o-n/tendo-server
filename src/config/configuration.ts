@@ -7,11 +7,11 @@ export default () => ({
   jwt: {
     access: {
       secret: process.env.JWT_ACCESS_SECRET,
-      expiresIn: '60s',
+      expiresIn: '2d',
     },
     refresh: {
       secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: '120s',
+      expiresIn: '7d',
     },
   },
 });

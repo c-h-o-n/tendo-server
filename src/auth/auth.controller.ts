@@ -2,6 +2,7 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from './decorator/public.decorator';
+import { SignUpDto } from './dto/sign-up.dto';
 import { JwtRefreshTokenGuard } from './guard/jwt-refresh.guard';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 
@@ -10,27 +11,27 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @Post('signup')
+  signup(@Body() body: SignUpDto) {
+    return this.authService.signup(body);
+  }
+
+  @Public()
   @UseGuards(LocalAuthGuard)
-  @Post('login')
-  login(@Req() req: Request): Promise<any> {
-    return this.authService.login(req.user);
+  @Post('signin')
+  signin(@Req() req: Request) {
+    return this.authService.signin(req.user);
   }
 
   @Public()
   @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh')
-  refreshToken(@Req() req, @Body() body): Promise<any> {
+  refreshToken(@Req() req, @Body() body) {
     return this.authService.refreshToken(req.user, body);
   }
 
-  @Public()
-  @Post('register')
-  register(@Body() body: any): Promise<any> {
-    return this.authService.register(body);
-  }
-
-  @Post('logout')
-  logout(@Req() req: Request): Promise<any> {
-    return this.authService.logout(req);
+  @Post('signout')
+  signout(@Req() req: Request) {
+    return this.authService.signout(req);
   }
 }
