@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Team } from '@prisma/client';
+
+// services
 import { PrismaService } from 'src/prisma/prisma.service';
+
+// types
+import { Team, TeamMember } from '@prisma/client';
 import { CreateTeamDto } from './dto/create-team.dto';
 
 @Injectable()
@@ -27,8 +31,40 @@ export class TeamService {
     });
   }
 
+  async getAllTeam(): Promise<Team[]> {
+    return await this.prisma.team.findMany();
+  }
+
   async getTeam(id: string): Promise<Team> {
     return await this.prisma.team.findFirst({ where: { id: id } });
+  }
+
+  async getUsersTeams(id: string): Promise<any[]> {
+    return await this.prisma.team.findMany({
+      where: {
+        TeamMember: {
+          some: {
+            userId: id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        location: true,
+        wins: true,
+        loses: true,
+        elo: true,
+        TeamMember: {
+          select: {
+            User: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
   }
 
   async deleteTeam(id: string): Promise<Team> {
@@ -41,6 +77,13 @@ export class TeamService {
       where: {
         id: id,
       },
+    });
+  }
+
+  async joinTeam(id: string, user: any): Promise<TeamMember> {
+    console.log(user);
+    return await this.prisma.teamMember.create({
+      data: { updatedAt: new Date(), role: 'member', userId: user.id, teamId: id },
     });
   }
 }

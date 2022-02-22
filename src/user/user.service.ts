@@ -12,24 +12,4 @@ export class UserService {
     });
     return user;
   }
-
-  async getUsersTeams(id: string): Promise<any[]> {
-    return await this.prisma.team.findMany({
-      where: {
-        TeamMember: {
-          some: {
-            userId: id,
-          },
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        location: true,
-        wins: true,
-        loses: true,
-        elo: true,
-      },
-    });
-  }
 }

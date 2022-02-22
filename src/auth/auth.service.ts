@@ -49,6 +49,8 @@ export class AuthService {
     const payload = { username: user.username, sub: user.id };
 
     return {
+      id: user.id,
+      username: user.username,
       access_token: this.getAccessToken(payload),
       refresh_token: this.getRefreshToken(payload),
     };
