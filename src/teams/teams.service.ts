@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
-
-// services
-import { PrismaService } from 'src/prisma/prisma.service';
-
-// types
 import { Team, TeamMember } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 
 @Injectable()
-export class TeamService {
+export class TeamsService {
   constructor(private prisma: PrismaService) {}
 
   // Create team and add the user as captain

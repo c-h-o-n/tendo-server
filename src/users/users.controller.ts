@@ -1,10 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { TeamService } from 'src/team/team.service';
-import { UserService } from './user.service';
+import { TeamsService } from 'src/teams/teams.service';
+import { UsersService } from './users.service';
 
-@Controller('user')
-export class UserController {
-  constructor(private userService: UserService, private teamService: TeamService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private userService: UsersService, private teamService: TeamsService) {}
 
   @Get(':username')
   async getUser(@Param('username') username): Promise<any> {
