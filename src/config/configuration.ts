@@ -1,4 +1,5 @@
 export default () => ({
+  // TODO use port and database in project
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
     host: process.env.DATABASE_HOST,
@@ -12,6 +13,14 @@ export default () => ({
     refresh: {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '7d',
+    },
+  },
+  gcp: {
+    project: process.env.GCP_PROJECT,
+    clientEmail: process.env.GCP_CLIENT_EMAIL,
+    privateKey: process.env.GCP_PRIVATE_KEY,
+    gcs: {
+      bucket: process.env.GCS_BUCKET,
     },
   },
 });

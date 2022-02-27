@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TeamsModule } from './teams/teams.module';
+import { StorageModule } from './storage/storage.module';
 
 import configuration from './config/configuration';
 
@@ -18,6 +19,7 @@ import configuration from './config/configuration';
     AuthModule,
     UsersModule,
     TeamsModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

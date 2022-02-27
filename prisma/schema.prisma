@@ -1,4 +1,5 @@
 // TODO make updateAt automaticly up-to-date by triggers
+// TODO rename uri to url
 generator client {
   provider = "prisma-client-js"
 }
@@ -38,6 +39,7 @@ model Team {
   wins                      Int                     @default(0)
   loses                     Int                     @default(0)
   elo                       Int?
+  logoUri                   String?
   createdBy                 String?                 @db.Uuid
   updatedBy                 String?                 @db.Uuid
   createdAt                 DateTime                @default(now()) @db.Timestamp(6)
@@ -119,7 +121,7 @@ model User {
   lastLogin                              DateTime?     @db.Timestamp(6)
   createdAt                              DateTime      @default(now()) @db.Timestamp(6)
   updatedAt                              DateTime      @db.Timestamp(6)
-  image                                  Bytes?
+  avatarUri                              String?
   birthDate                              DateTime      @db.Date
   Match                                  Match[]
   Team_Team_createdByToUser              Team[]        @relation("Team_createdByToUser")

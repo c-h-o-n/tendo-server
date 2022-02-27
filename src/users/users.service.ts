@@ -12,4 +12,14 @@ export class UsersService {
     });
     return user;
   }
+
+  async updateUser(id: string, data: any): Promise<User> {
+    return await this.prisma.user.update({
+      data: {
+        updatedAt: new Date(),
+        ...data,
+      },
+      where: { id: id },
+    });
+  }
 }

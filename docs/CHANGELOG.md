@@ -15,3 +15,9 @@
 `0.1.2`
 
 - add user service
+
+`0.1.3`
+
+- add team service
+- refactor codebase
+- add gcp/gcs (storage) service
