@@ -10,18 +10,20 @@ import { PasswordService } from './password.service';
 import { Request } from 'express';
 import { User } from '@prisma/client';
 import { SignUpDto } from './dto/sign-up.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
+    private userService: UsersService,
     private jwtService: JwtService,
     private passwordService: PasswordService,
     private config: ConfigService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.getUserCredentials(username);
+    const user = await this.userService.getUserByUsername(username);
 
     if (user) {
       const isPasswordValid = await this.passwordService.validatePassword(password, user.passwordHash);
@@ -32,19 +34,6 @@ export class AuthService {
     }
 
     return null;
-  }
-
-  async getUserCredentials(username: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        username: username,
-      },
-      select: {
-        id: true,
-        username: true,
-        passwordHash: true,
-      },
-    });
   }
 
   async signin(user: any): Promise<any> {
@@ -58,21 +47,10 @@ export class AuthService {
     };
   }
 
-  async signup(body: SignUpDto): Promise<User> {
-    const passwordHash = await this.passwordService.hashPassword(body.password);
+  async signup(data: SignUpDto): Promise<User> {
+    const passwordHash = await this.passwordService.hashPassword(data.password);
 
-    return await this.prisma.user.create({
-      data: {
-        username: body.username,
-        passwordHash: passwordHash,
-        firstName: body.firstName,
-        lastName: body.lastName,
-        email: body.email,
-        birthDate: new Date(1997, 12, 13),
-        location: body.location,
-        updatedAt: new Date(),
-      },
-    });
+    return await this.userService.createUser(data, passwordHash);
   }
 
   async refreshToken(user: any, body: any): Promise<any> {
@@ -98,6 +76,6 @@ export class AuthService {
 
   // TODO implement logout
   async signout(req: Request): Promise<any> {
-    return { logout: req.user };
+    return { signout: req.user };
   }
 }

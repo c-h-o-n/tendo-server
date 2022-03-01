@@ -8,11 +8,11 @@ export class TeamsService {
   constructor(private prisma: PrismaService) {}
 
   // Create team and add the user as captain
-  async createTeam(body: CreateTeamDto, user: any): Promise<Team> {
+  async createTeam(data: CreateTeamDto, user: any): Promise<Team> {
     return await this.prisma.team.create({
       data: {
-        name: body.name,
-        location: body.location,
+        name: data.name,
+        location: data.location,
         updatedAt: new Date(),
         createdBy: user.id,
         updatedBy: user.id,
@@ -35,7 +35,7 @@ export class TeamsService {
     return await this.prisma.team.findFirst({ where: { id: id } });
   }
 
-  async getUsersTeams(id: string): Promise<any[]> {
+  async getUsersTeams(id: string): Promise<Team[]> {
     return await this.prisma.team.findMany({
       where: {
         TeamMember: {
@@ -44,21 +44,30 @@ export class TeamsService {
           },
         },
       },
-      select: {
-        id: true,
-        name: true,
-        location: true,
-        wins: true,
-        loses: true,
-        elo: true,
-        TeamMember: {
-          select: {
-            User: true,
-          },
-        },
-      },
+      // select: {
+      //   id: true,
+      //   name: true,
+      //   location: true,
+      //   wins: true,
+      //   loses: true,
+      //   elo: true,
+      //   TeamMember: {
+      //     select: {
+      //       User: true,
+      //       role: true,
+      //     },
+      //   },
+      // },
       orderBy: {
         createdAt: 'asc',
+      },
+    });
+  }
+
+  async getTeamMembers(id: string): Promise<TeamMember[]> {
+    return await this.prisma.teamMember.findMany({
+      where: {
+        teamId: id,
       },
     });
   }

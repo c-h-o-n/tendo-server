@@ -24,34 +24,70 @@ export class UsersController {
   ) {}
 
   @Get(':username')
-  getUser(@Param('username') username) {
-    return this.userService.getUserByUsername(username);
+  async getUser(@Param('username') username) {
+    const user = await this.userService.getUserByUsername(username);
+
+    return {
+      id: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      location: user.location,
+      avatarUrl: user.avatarUrl,
+      wins: user.wins,
+      loses: user.loses,
+      games: user.wins + user.loses,
+      elo: user.elo,
+      age: new Date().getUTCFullYear() - user.birthDate.getUTCFullYear(),
+      height: user.height,
+      weight: user.weight,
+      intro: user.intro,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
+    };
   }
 
   @Get(':id/teams')
-  async getTeamsByUserId(@Param('id') id: string): Promise<any[]> {
+  async getTeamsByUserId(@Param('id') id: string): Promise<any> {
     const teams = await this.teamService.getUsersTeams(id);
+    const response = [];
 
-    return teams.map((team) => {
-      return {
-        id: team.id,
-        name: team.name,
-        location: team.location,
-        wins: team.wins,
-        loses: team.loses,
-        elo: team.elo,
-        members: team.TeamMember.map((user) => user.User),
-      };
-    });
+    for (const team of teams) {
+      const members = await this.teamService.getTeamMembers(team.id);
+      const users = [];
+      for (const member of members) {
+        const user = await this.userService.getUser(member.userId);
+
+        users.push({
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatarUrl: user.avatarUrl,
+          elo: user.elo,
+          role: member.role,
+        });
+      }
+
+      response.push({ ...team, members: users });
+    }
+
+    return response;
   }
 
   // upload profile image
   @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', { limits: { files: 1 } }))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
-    const avatarUri = await this.storageService.upload(`avatars/${id}`, file.mimetype, file.buffer, [{}]);
-    console.log(avatarUri);
-    return this.userService.updateUser(id, { avatarUri: avatarUri });
+    const avatarUrl = await this.storageService.upload(`avatars/${id}`, file.mimetype, file.buffer, [{}]);
+    console.log(avatarUrl);
+    const updatedUser = await this.userService.updateUser(id, { avatarUrl: avatarUrl });
+
+    return {
+      username: updatedUser.username,
+      avatarUrl: updatedUser.avatarUrl,
+    };
   }
 
   @Get(':id/download')

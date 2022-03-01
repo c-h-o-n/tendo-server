@@ -12,8 +12,12 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  signup(@Body() body: SignUpDto) {
-    return this.authService.signup(body);
+  async signup(@Body() body: SignUpDto) {
+    const createdUser = await this.authService.signup(body);
+    return {
+      id: createdUser.id,
+      username: createdUser.username,
+    };
   }
 
   @Public()
