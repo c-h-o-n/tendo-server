@@ -37,6 +37,19 @@ export class UsersService {
     return user;
   }
 
+  async getUserMvpCount(id: string): Promise<number> {
+    const mvps = await this.prisma.match.aggregate({
+      where: {
+        mvpId: id,
+      },
+      _count: {
+        mvpId: true,
+      },
+    });
+
+    return mvps._count.mvpId;
+  }
+
   async updateUser(id: string, data: any): Promise<User> {
     return await this.prisma.user.update({
       data: {

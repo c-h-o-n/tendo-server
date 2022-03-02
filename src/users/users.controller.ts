@@ -26,7 +26,8 @@ export class UsersController {
   @Get(':username')
   async getUser(@Param('username') username) {
     const user = await this.userService.getUserByUsername(username);
-
+    const mvps = await this.userService.getUserMvpCount(user.id);
+    console.log('mvp', mvps);
     return {
       id: user.id,
       username: user.username,
@@ -40,6 +41,7 @@ export class UsersController {
       games: user.wins + user.loses,
       elo: user.elo,
       age: new Date().getUTCFullYear() - user.birthDate.getUTCFullYear(),
+      mvps: mvps,
       height: user.height,
       weight: user.weight,
       intro: user.intro,
@@ -58,13 +60,14 @@ export class UsersController {
       const users = [];
       for (const member of members) {
         const user = await this.userService.getUser(member.userId);
-
+        const mvps = await this.userService.getUserMvpCount(member.userId);
         users.push({
           id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
           avatarUrl: user.avatarUrl,
+          mvps: mvps,
           elo: user.elo,
           role: member.role,
         });
