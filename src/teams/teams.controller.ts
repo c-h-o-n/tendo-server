@@ -5,10 +5,11 @@ import { TeamsService } from './teams.service';
 // types
 import { Request } from 'express';
 import { CreateTeamDto } from './dto/create-team.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('teams')
 export class TeamsController {
-  constructor(private teamService: TeamsService) {}
+  constructor(private teamService: TeamsService, private userService: UsersService) {}
 
   // Create a team
   @Post()
@@ -26,8 +27,31 @@ export class TeamsController {
 
   // Get team by id
   @Get(':id')
-  getTeam(@Param('id') id: string) {
-    return this.teamService.getTeam(id);
+  async getTeam(@Param('id') id: string): Promise<any> {
+    const team = await this.teamService.getTeam(id);
+
+    const members = team.TeamMember.map((member) => {
+      return {
+        id: member.User.id,
+        firstName: member.User.firstName,
+        lastName: member.User.lastName,
+        avatarUrl: member.User.avatarUrl,
+        role: member.role,
+        mvps: member.User._count.Match,
+      };
+    });
+
+    return {
+      id: team.id,
+      name: team.name,
+      location: team.location,
+      logoUrl: team.logoUrl,
+      wins: team.wins,
+      loses: team.loses,
+      games: team.wins + team.loses,
+      elo: team.elo,
+      members: members,
+    };
   }
 
   // Update team by id
@@ -42,7 +66,7 @@ export class TeamsController {
     return this.teamService.deleteTeam(id);
   }
 
-  // Join to team by id
+  // Join team by id
   @Post(':id/join')
   joinTeam(@Param('id') id: string, @Req() req: Request) {
     return this.teamService.joinTeam(id, req.user);

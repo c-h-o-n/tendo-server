@@ -27,7 +27,7 @@ export class UsersController {
   async getUser(@Param('username') username) {
     const user = await this.userService.getUserByUsername(username);
     const mvps = await this.userService.getUserMvpCount(user.id);
-    console.log('mvp', mvps);
+
     return {
       id: user.id,
       username: user.username,
@@ -56,26 +56,28 @@ export class UsersController {
     const response = [];
 
     for (const team of teams) {
-      const members = await this.teamService.getTeamMembers(team.id);
-      const users = [];
-      for (const member of members) {
-        const user = await this.userService.getUser(member.userId);
-        const mvps = await this.userService.getUserMvpCount(member.userId);
-        users.push({
-          id: user.id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          avatarUrl: user.avatarUrl,
-          mvps: mvps,
-          elo: user.elo,
+      const members = team.TeamMember.map((member) => {
+        return {
+          id: member.User.id,
+          firstName: member.User.firstName,
+          lastName: member.User.lastName,
+          avatarUrl: member.User.avatarUrl,
           role: member.role,
-        });
-      }
-
-      response.push({ ...team, members: users });
+          mvps: member.User._count.Match,
+        };
+      });
+      response.push({
+        id: team.id,
+        name: team.name,
+        location: team.location,
+        logoUrl: team.logoUrl,
+        wins: team.wins,
+        loses: team.loses,
+        games: team.wins + team.loses,
+        elo: team.elo,
+        members: members,
+      });
     }
-
     return response;
   }
 
