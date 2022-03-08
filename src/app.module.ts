@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { TeamsModule } from './teams/teams.module';
 import { StorageModule } from './storage/storage.module';
 import { SearchModule } from './search/search.module';
+import { MatchModule } from './match/match.module';
 
 import configuration from './config/configuration';
 
@@ -22,6 +23,7 @@ import configuration from './config/configuration';
     TeamsModule,
     StorageModule,
     SearchModule,
+    MatchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

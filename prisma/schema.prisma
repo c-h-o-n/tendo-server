@@ -12,8 +12,8 @@ datasource db {
 
 model Match {
   id                       String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  teamAId                  String?           @db.Uuid
-  teamBId                  String?           @db.Uuid
+  teamAId                  String            @db.Uuid
+  teamBId                  String            @db.Uuid
   mvpId                    String?           @db.Uuid
   status                   MatchStatus
   datetime                 DateTime          @db.Timestamp(6)
@@ -136,7 +136,6 @@ model User {
   UserFriend_UserToUserFriend_targetId   UserFriend[]  @relation("UserToUserFriend_targetId")
   UserMessage_UserToUserMessage_sourceId UserMessage[] @relation("UserToUserMessage_sourceId")
   UserMessage_UserToUserMessage_targetId UserMessage[] @relation("UserToUserMessage_targetId")
-  UserPost                               UserPost[]
   UserSport                              UserSport[]
 }
 
@@ -160,15 +159,6 @@ model UserMessage {
   updatedAt                       DateTime @db.Timestamp(6)
   User_UserToUserMessage_sourceId User     @relation("UserToUserMessage_sourceId", fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   User_UserToUserMessage_targetId User     @relation("UserToUserMessage_targetId", fields: [targetId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model UserPost {
-  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  sourceId  String   @db.Uuid
-  content   String   @db.VarChar(120)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @db.Timestamp(6)
-  User      User     @relation(fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model UserSport {
