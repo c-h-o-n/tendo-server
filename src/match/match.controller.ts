@@ -5,34 +5,40 @@ import { MatchService } from './match.service';
 export class MatchController {
   constructor(private matchService: MatchService) {}
 
-  @Get(':userId')
-  async getFixturesByUserId(@Param('userId') userId) {
-    const fixtures = await this.matchService.getFixturesByUserId(userId);
-    const response = [];
-
-    for (const fixture of fixtures) {
-      const teamA = {
-        id: fixture.Team_Match_teamAIdToTeam.id,
-        name: fixture.Team_Match_teamAIdToTeam.name,
-        location: fixture.Team_Match_teamAIdToTeam.location,
-        logoUrl: fixture.Team_Match_teamAIdToTeam.logoUrl,
-      };
-
-      const teamB = {
-        id: fixture.Team_Match_teamBIdToTeam.id,
-        name: fixture.Team_Match_teamBIdToTeam.name,
-        location: fixture.Team_Match_teamBIdToTeam.location,
-        logoUrl: fixture.Team_Match_teamBIdToTeam.logoUrl,
-      };
-      response.push({
-        id: fixture.id,
-        datetime: fixture.datetime,
-        status: fixture.status,
-        teamA: teamA,
-        teamB: teamB,
-      });
-    }
-
-    return response;
+  @Get(':id')
+  async getMatch(@Param('id') id: string) {
+    const match = await this.matchService.getMatch(id);
+    return {
+      id: match.id,
+      status: match.status,
+      datetime: match.datetime,
+      teamA: {
+        id: match.Team_Match_teamAIdToTeam.id,
+        location: match.Team_Match_teamAIdToTeam.location,
+        name: match.Team_Match_teamAIdToTeam.name,
+        logoUrl: match.Team_Match_teamAIdToTeam.logoUrl,
+        members: match.Team_Match_teamAIdToTeam.TeamMember.map((member) => ({
+          id: member.User.id,
+          username: member.User.username,
+          firstName: member.User.firstName,
+          lastName: member.User.lastName,
+          role: member.role,
+        })),
+      },
+      teamB: {
+        id: match.Team_Match_teamBIdToTeam.id,
+        location: match.Team_Match_teamBIdToTeam.location,
+        name: match.Team_Match_teamBIdToTeam.name,
+        logoUrl: match.Team_Match_teamBIdToTeam.logoUrl,
+        members: match.Team_Match_teamBIdToTeam.TeamMember.map((member) => ({
+          id: member.User.id,
+          username: member.User.username,
+          firstName: member.User.firstName,
+          lastName: member.User.lastName,
+          role: member.role,
+        })),
+      },
+      mvp: match.User,
+    };
   }
 }

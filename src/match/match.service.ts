@@ -1,16 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { Match, Team } from '@prisma/client';
+import { Match, Team, TeamMember, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MatchService {
   constructor(private prisma: PrismaService) {}
 
-  async getFixturesByUserId(
-    userId: string,
-  ): Promise<(Match & { Team_Match_teamBIdToTeam: Team; Team_Match_teamAIdToTeam: Team })[]> {
+  async getMatch(id: string) {
+    return await this.prisma.match.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        Team_Match_teamAIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: true,
+              },
+            },
+          },
+        },
+        Team_Match_teamBIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: true,
+              },
+            },
+          },
+        },
+        User: true,
+      },
+    });
+  }
+
+  async getFixturesByUserId(userId: string) {
     return await this.prisma.match.findMany({
       where: {
+        datetime: {
+          gt: new Date(),
+        },
         OR: [
           {
             Team_Match_teamAIdToTeam: {

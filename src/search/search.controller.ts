@@ -8,7 +8,6 @@ export class SearchController {
   @Get('')
   async search(@Query() queryParams) {
     const { term, type } = queryParams;
-    console.log(term, type);
 
     const response = await this.searchService.search(term);
 
