@@ -1,9 +1,23 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { NotificationService } from 'src/notification/notification.service';
+import { CreateMatchDto } from './dto/create-match.dto';
 import { MatchService } from './match.service';
 
 @Controller('match')
 export class MatchController {
-  constructor(private matchService: MatchService) {}
+  constructor(private matchService: MatchService, private notificationService: NotificationService) {}
+
+  @Post()
+  async createMatch(@Body() body: CreateMatchDto) {
+    const createdMatch = await this.matchService.createMatch(body);
+    this.notificationService.addCronJob(createdMatch.id, createdMatch.datetime);
+    return createdMatch;
+  }
+
+  @Get('cron/all')
+  getCrons() {
+    return JSON.stringify(this.notificationService.getCronJobs());
+  }
 
   @Get(':id')
   async getMatch(@Param('id') id: string) {

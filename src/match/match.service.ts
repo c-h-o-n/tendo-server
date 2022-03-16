@@ -1,10 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { Match, Team, TeamMember, User } from '@prisma/client';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateMatchDto } from './dto/create-match.dto';
 
 @Injectable()
 export class MatchService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private schedulerRegistry: SchedulerRegistry) {}
+
+  async createMatch(data: CreateMatchDto) {
+    return this.prisma.match.create({
+      data: {
+        teamAId: data.teamAId,
+        teamBId: data.teamBId,
+        datetime: new Date(data.datetime),
+        status: 'scheduled',
+        updatedAt: new Date(),
+      },
+    });
+  }
 
   async getMatch(id: string) {
     return await this.prisma.match.findUnique({
