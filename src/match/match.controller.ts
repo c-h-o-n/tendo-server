@@ -16,7 +16,7 @@ export class MatchController {
 
   @Get('cron/all')
   getCrons() {
-    return JSON.stringify(this.notificationService.getCronJobs());
+    return this.notificationService.getCronJobs();
   }
 
   @Get(':id')
