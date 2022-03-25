@@ -35,17 +35,9 @@ export class StorageService {
         .on('finish', () => resolve(this.getStorageUrl(path)))
         .end(media);
     });
-    return file
-      .createWriteStream({ contentType: contentType, resumable: false, gzip: true })
-      .on('finish', async () => {
-        return await file.setMetadata({
-          metadata: object,
-        });
-      })
-      .end(media);
   }
 
-  async get(path: string): Promise<StorageFile> {
+  async getFile(path: string): Promise<StorageFile> {
     const fileResponse: DownloadResponse = await this.storage.bucket(this.bucket).file(path).download();
     const [buffer] = fileResponse;
     const storageFile = new StorageFile();

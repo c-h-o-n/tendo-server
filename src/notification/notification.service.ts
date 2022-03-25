@@ -68,4 +68,15 @@ export class NotificationService {
       },
     });
   }
+
+  async detachPushTokenFromUser(userId: string, pushToken: string) {
+    return await this.prisma.pushToken.delete({
+      where: {
+        userId_pushToken: {
+          userId: userId,
+          pushToken: pushToken,
+        },
+      },
+    });
+  }
 }

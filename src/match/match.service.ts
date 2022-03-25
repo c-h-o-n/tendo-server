@@ -135,4 +135,25 @@ export class MatchService {
       },
     });
   }
+
+  async updateMatch(id: string, data: any, user: any) {
+    return await this.prisma.match.update({
+      where: {
+        id: id,
+      },
+      data: {
+        updatedAt: new Date(),
+        updatedBy: user.id,
+        ...data,
+      },
+    });
+  }
+
+  async deleteMatch(id: string) {
+    return await this.prisma.match.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 }

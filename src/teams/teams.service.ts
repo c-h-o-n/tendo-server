@@ -8,6 +8,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 export class TeamsService {
   constructor(private prisma: PrismaService, private userService: UsersService) {}
 
+  // TODO upload and attach logoUrl
   // Create team and add the user as captain
   async createTeam(data: CreateTeamDto, user: any): Promise<Team> {
     return await this.prisma.team.create({
@@ -55,7 +56,7 @@ export class TeamsService {
     });
   }
 
-  async getUsersTeams(
+  async getTeamsByUserId(
     id: string,
   ): Promise<(Team & { TeamMember: (TeamMember & { User: User & { _count: { Match: number } } })[] })[]> {
     return await this.prisma.team.findMany({
@@ -95,17 +96,21 @@ export class TeamsService {
     });
   }
 
-  async deleteTeam(id: string): Promise<Team> {
-    return await this.prisma.team.delete({ where: { id: id } });
-  }
-
-  async patchTeam(id: string, data: any, user: any): Promise<Team> {
+  async updateTeam(id: string, data: any, user: any): Promise<Team> {
     return await this.prisma.team.update({
-      data: { updatedAt: new Date(), updatedBy: user.id, ...data },
       where: {
         id: id,
       },
+      data: {
+        updatedAt: new Date(),
+        updatedBy: user.id,
+        ...data,
+      },
     });
+  }
+
+  async deleteTeam(id: string): Promise<Team> {
+    return await this.prisma.team.delete({ where: { id: id } });
   }
 
   async joinTeam(id: string, user: any): Promise<TeamMember> {

@@ -1,7 +1,7 @@
 // LATER make updateAt automaticly up-to-date by triggers
 // LATER change more convenient naming convention
 
-// TODO add new table with userid - push token, no constraint needed
+// CHECK better naming for PushToken table
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]

@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -54,7 +55,7 @@ export class UsersController {
 
   @Get(':id/teams')
   async getTeamsByUserId(@Param('id') id: string): Promise<any> {
-    const teams = await this.teamService.getUsersTeams(id);
+    const teams = await this.teamService.getTeamsByUserId(id);
     const response = [];
 
     for (const team of teams) {
@@ -131,7 +132,7 @@ export class UsersController {
   async downloadMedia(@Param('id') id: string, @Res() res: Response) {
     let storageFile: any;
     try {
-      storageFile = await this.storageService.get('avatars/' + id);
+      storageFile = await this.storageService.getFile('avatars/' + id);
     } catch (e) {
       if (e.message.toString().includes('No such object')) {
         throw new NotFoundException('image not found');
@@ -142,5 +143,10 @@ export class UsersController {
     // res.setHeader('Content-Type', storageFile.contentType);
     res.setHeader('Cache-Control', 'max-age=60d');
     res.end(storageFile.buffer);
+  }
+
+  @Delete(':id')
+  deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
   }
 }

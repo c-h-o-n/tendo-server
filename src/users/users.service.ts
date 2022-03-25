@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  // TODO upload avatar and attach url to avatarUrl prop
   async createUser(data: SignUpDto, passwordHash): Promise<User> {
     return await this.prisma.user.create({
       data: {
@@ -50,13 +51,22 @@ export class UsersService {
     return mvps._count.mvpId;
   }
 
-  async updateUser(id: string, data: any): Promise<User> {
+  async updateUser(id: string, data: any, user: any): Promise<User> {
     return await this.prisma.user.update({
+      where: { id: id },
       data: {
         updatedAt: new Date(),
+        updatedBy: user.id,
         ...data,
       },
-      where: { id: id },
+    });
+  }
+
+  async deleteUser(id: string): Promise<User> {
+    return await this.prisma.user.delete({
+      where: {
+        id: id,
+      },
     });
   }
 }

@@ -57,7 +57,7 @@ export class TeamsController {
   // Update team by id
   @Patch(':id')
   editTeam(@Param('id') id: string, @Body() body: any, @Req() req: Request) {
-    return this.teamService.patchTeam(id, body, req.user);
+    return this.teamService.updateTeam(id, body, req.user);
   }
 
   // Delete team by id
