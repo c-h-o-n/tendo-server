@@ -4,6 +4,7 @@
 
 `0.1.0`
 
+- `MILESTONE: jwt auth`
 - init prisma with migration
 - implement local/jwt auth
 - add configuration
@@ -21,3 +22,7 @@
 - add team service
 - refactor codebase
 - add gcp/gcs (storage) service
+
+`0.2.0`
+
+- `MILESTONE: search, match notification`
