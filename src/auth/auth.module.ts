@@ -16,6 +16,7 @@ import { AuthService } from './auth.service';
 import { PasswordService } from './password.service';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UsersService } from 'src/users/users.service';
       },
       inject: [ConfigService],
     }),
+    NotificationModule,
   ],
   providers: [
     AuthService,

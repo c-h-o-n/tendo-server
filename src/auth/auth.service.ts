@@ -76,6 +76,7 @@ export class AuthService {
 
   // TODO implement logout
   async signout(req: Request): Promise<any> {
+    req.logOut();
     return { signout: req.user };
   }
 }

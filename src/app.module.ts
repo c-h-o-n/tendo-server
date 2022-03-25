@@ -13,6 +13,7 @@ import { StorageModule } from './storage/storage.module';
 import { SearchModule } from './search/search.module';
 import { MatchModule } from './match/match.module';
 import { NotificationModule } from './notification/notification.module';
+import { CronModule } from './cron/cron.module';
 
 import configuration from './config/configuration';
 
@@ -28,6 +29,7 @@ import configuration from './config/configuration';
     SearchModule,
     MatchModule,
     NotificationModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],

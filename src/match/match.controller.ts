@@ -1,22 +1,45 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CronService } from 'src/cron/cron.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { MatchService } from './match.service';
 
 @Controller('match')
 export class MatchController {
-  constructor(private matchService: MatchService, private notificationService: NotificationService) {}
+  constructor(
+    private matchService: MatchService,
+    private cronService: CronService,
+    private notificationService: NotificationService,
+  ) {}
 
   @Post()
   async createMatch(@Body() body: CreateMatchDto) {
     const createdMatch = await this.matchService.createMatch(body);
-    this.notificationService.addCronJob(createdMatch.id, createdMatch.datetime);
+
+    const members = createdMatch.Team_Match_teamAIdToTeam.TeamMember.map((member) => member.User);
+    members.push(...createdMatch.Team_Match_teamBIdToTeam.TeamMember.map((member) => member.User));
+    const pushTokens = [];
+    for (const member of members) {
+      if (member.PushToken.length) {
+        const expoToken = await this.notificationService.getExpoPushTokenByUserId(member.id);
+        pushTokens.push(...expoToken.map((et) => et.pushToken));
+      }
+    }
+    this.cronService.addCronJob(createdMatch, pushTokens);
     return createdMatch;
   }
 
   @Get('cron/all')
   getCrons() {
-    return this.notificationService.getCronJobs();
+    return this.cronService.logAllCronJobs();
+  }
+  @Get('noti/send')
+  sendNot() {
+    return this.notificationService.sendNotification(
+      ['ExponentPushToken[R8qZFFCOxl84OBOnpsUOt1]'],
+      'From ur lover',
+      'i love u so much!',
+    );
   }
 
   @Get(':id')

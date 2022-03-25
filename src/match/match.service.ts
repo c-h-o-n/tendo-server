@@ -1,21 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { SchedulerRegistry } from '@nestjs/schedule';
-import { CronJob } from 'cron';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 
 @Injectable()
 export class MatchService {
-  constructor(private prisma: PrismaService, private schedulerRegistry: SchedulerRegistry) {}
+  constructor(private prisma: PrismaService) {}
 
   async createMatch(data: CreateMatchDto) {
-    return this.prisma.match.create({
+    return await this.prisma.match.create({
       data: {
         teamAId: data.teamAId,
         teamBId: data.teamBId,
         datetime: new Date(data.datetime),
         status: 'scheduled',
         updatedAt: new Date(),
+      },
+      include: {
+        Team_Match_teamAIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: {
+                  include: { PushToken: true },
+                },
+              },
+            },
+          },
+        },
+        Team_Match_teamBIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: {
+                  include: { PushToken: true },
+                },
+              },
+            },
+          },
+        },
+        User: true,
       },
     });
   }
@@ -45,6 +68,36 @@ export class MatchService {
           },
         },
         User: true,
+      },
+    });
+  }
+
+  async getAllFixtures() {
+    return await this.prisma.match.findMany({
+      where: { datetime: { gt: new Date() } },
+      include: {
+        Team_Match_teamAIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: {
+                  include: { PushToken: true },
+                },
+              },
+            },
+          },
+        },
+        Team_Match_teamBIdToTeam: {
+          include: {
+            TeamMember: {
+              include: {
+                User: {
+                  include: { PushToken: true },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }

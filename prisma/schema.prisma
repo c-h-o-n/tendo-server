@@ -1,5 +1,7 @@
 // LATER make updateAt automaticly up-to-date by triggers
 // LATER change more convenient naming convention
+
+// TODO add new table with userid - push token, no constraint needed
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
@@ -137,6 +139,7 @@ model User {
   UserMessage_UserToUserMessage_sourceId UserMessage[] @relation("UserToUserMessage_sourceId")
   UserMessage_UserToUserMessage_targetId UserMessage[] @relation("UserToUserMessage_targetId")
   UserSport                              UserSport[]
+  PushToken                              PushToken[]
 }
 
 model UserFriend {
@@ -169,6 +172,14 @@ model UserSport {
   updatedAt DateTime @db.Timestamp(6)
   Sport     Sport    @relation(fields: [sportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PushToken {
+  userId    String @db.Uuid
+  pushToken String @db.VarChar(41)
+
+  User User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@id([userId, pushToken])
 }
 
 enum FriendshipStatus {
