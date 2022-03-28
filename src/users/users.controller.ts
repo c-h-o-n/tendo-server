@@ -5,13 +5,14 @@ import {
   NotFoundException,
   Param,
   Post,
+  Req,
   Res,
   ServiceUnavailableException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { MatchService } from 'src/match/match.service';
 import { StorageService } from 'src/storage/storage.service';
 import { TeamsService } from 'src/teams/teams.service';
@@ -117,10 +118,10 @@ export class UsersController {
   // upload profile image
   @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', { limits: { files: 1 } }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Req() request: Request) {
     const avatarUrl = await this.storageService.upload(`avatars/${id}`, file.mimetype, file.buffer, [{}]);
     console.log(avatarUrl);
-    const updatedUser = await this.userService.updateUser(id, { avatarUrl: avatarUrl });
+    const updatedUser = await this.userService.updateUser(id, { avatarUrl: avatarUrl }, request.user);
 
     return {
       username: updatedUser.username,
