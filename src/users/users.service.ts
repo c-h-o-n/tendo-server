@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { SignUpDto } from 'src/auth/dto/sign-up.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // TODO upload avatar and attach url to avatarUrl prop
   async createUser(data: SignUpDto, passwordHash): Promise<User> {
     return await this.prisma.user.create({
       data: {
@@ -56,7 +56,7 @@ export class UsersService {
       where: { id: id },
       data: {
         updatedAt: new Date(),
-        updatedBy: user.id,
+        // updatedBy: user.id,
         ...data,
       },
     });

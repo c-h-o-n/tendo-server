@@ -8,7 +8,6 @@ import { CreateTeamDto } from './dto/create-team.dto';
 export class TeamsService {
   constructor(private prisma: PrismaService, private userService: UsersService) {}
 
-  // TODO upload and attach logoUrl
   // Create team and add the user as captain
   async createTeam(data: CreateTeamDto, user: any): Promise<Team> {
     return await this.prisma.team.create({

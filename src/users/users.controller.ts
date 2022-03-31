@@ -118,9 +118,8 @@ export class UsersController {
   // upload profile image
   @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', { limits: { files: 1 } }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Req() request: Request) {
+  async uploadAvatar(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Req() request: Request) {
     const avatarUrl = await this.storageService.upload(`avatars/${id}`, file.mimetype, file.buffer, [{}]);
-    console.log(avatarUrl);
     const updatedUser = await this.userService.updateUser(id, { avatarUrl: avatarUrl }, request.user);
 
     return {

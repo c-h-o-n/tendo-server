@@ -1,15 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
-
-import { TeamsService } from './teams.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 // types
 import { Request } from 'express';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { UsersService } from 'src/users/users.service';
+
+// services
+import { TeamsService } from './teams.service';
+import { StorageService } from 'src/storage/storage.service';
 
 @Controller('teams')
 export class TeamsController {
-  constructor(private teamService: TeamsService, private userService: UsersService) {}
+  constructor(private teamService: TeamsService, private storageService: StorageService) {}
 
   // Create a team
   @Post()
@@ -70,5 +72,18 @@ export class TeamsController {
   @Post(':id/join')
   joinTeam(@Param('id') id: string, @Req() req: Request) {
     return this.teamService.joinTeam(id, req.user);
+  }
+
+  @Post(':id/upload')
+  @UseInterceptors(FileInterceptor('file', { limits: { files: 1 } }))
+  async uploadLogo(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Req() request: Request) {
+    const logoUrl = await this.storageService.upload(`logos/${id}`, file.mimetype, file.buffer, [{}]);
+    const updatedTeam = await this.teamService.updateTeam(id, { logoUrl: logoUrl }, request.user);
+
+    return {
+      location: updatedTeam.location,
+      name: updatedTeam.name,
+      logoUrl: updatedTeam.logoUrl,
+    };
   }
 }
