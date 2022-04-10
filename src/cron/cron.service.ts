@@ -35,7 +35,7 @@ export class CronService {
           participantsPushTokens,
           `${matchDetails.Team_Match_teamAIdToTeam.name} - ${matchDetails.Team_Match_teamBIdToTeam.name}`,
           matchDetails.datetime.toDateString(),
-          { matchId: matchDetails.id },
+          { url: 'matchup/' + matchDetails.id },
         );
 
         this.deleteCronJob(matchDetails.id);

@@ -39,6 +39,7 @@ export class MatchController {
       ['ExponentPushToken[R8qZFFCOxl84OBOnpsUOt1]'],
       'From ur lover',
       'i love u so much!',
+      { url: 'matchup/02414bf0-fb5d-4704-8d43-36560a4b80fe' },
     );
   }
 
