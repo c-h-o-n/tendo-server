@@ -16,7 +16,7 @@ import { NotificationModule } from './notification/notification.module';
 import { CronModule } from './cron/cron.module';
 
 import configuration from './config/configuration';
-
+// TODO add logger
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),

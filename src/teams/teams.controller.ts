@@ -74,6 +74,12 @@ export class TeamsController {
     return this.teamService.joinTeam(id, req.user);
   }
 
+  // Leave team by id
+  @Get(':id/leave')
+  leaveTeam(@Param('id') id: string) {
+    return this.teamService.leaveTeam(id);
+  }
+
   @Post(':id/upload')
   @UseInterceptors(FileInterceptor('file', { limits: { files: 1 } }))
   async uploadLogo(@UploadedFile() file: Express.Multer.File, @Param('id') id: string, @Req() request: Request) {

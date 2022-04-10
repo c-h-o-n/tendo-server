@@ -117,4 +117,12 @@ export class TeamsService {
       data: { updatedAt: new Date(), role: 'member', userId: user.id, teamId: id },
     });
   }
+
+  async leaveTeam(id: string): Promise<TeamMember> {
+    return await this.prisma.teamMember.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 }
