@@ -76,8 +76,8 @@ export class TeamsController {
 
   // Leave team by id
   @Get(':id/leave')
-  leaveTeam(@Param('id') id: string) {
-    return this.teamService.leaveTeam(id);
+  leaveTeam(@Param('id') id: string, @Req() req: Request) {
+    return this.teamService.leaveTeam(id, req.user);
   }
 
   @Post(':id/upload')
