@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Match } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 
@@ -136,14 +137,13 @@ export class MatchService {
     });
   }
 
-  async updateMatch(id: string, data: any, user: any) {
+  async updateMatch(id: string, data: Partial<Match>, user: any) {
     return await this.prisma.match.update({
       where: {
         id: id,
       },
       data: {
         updatedAt: new Date(),
-        updatedBy: user.id,
         ...data,
       },
     });

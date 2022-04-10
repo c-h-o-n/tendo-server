@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { Match } from '@prisma/client';
+import { Request } from 'express';
 import { CronService } from 'src/cron/cron.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { CreateMatchDto } from './dto/create-match.dto';
@@ -27,20 +29,6 @@ export class MatchController {
     }
     this.cronService.addCronJob(createdMatch, pushTokens);
     return createdMatch;
-  }
-
-  @Get('cron/all')
-  getCrons() {
-    return this.cronService.logAllCronJobs();
-  }
-  @Get('noti/send')
-  sendNot() {
-    return this.notificationService.sendNotification(
-      ['ExponentPushToken[R8qZFFCOxl84OBOnpsUOt1]'],
-      'From ur lover',
-      'i love u so much!',
-      { url: 'matchup/02414bf0-fb5d-4704-8d43-36560a4b80fe' },
-    );
   }
 
   @Get(':id')
@@ -78,5 +66,24 @@ export class MatchController {
       },
       mvp: match.User,
     };
+  }
+
+  @Patch(':id')
+  updateMatch(@Param('id') id: string, @Body() body: Partial<Match>, @Req() request: Request) {
+    return this.matchService.updateMatch(id, body, request.user);
+  }
+
+  @Get('cron/all')
+  getCrons() {
+    return this.cronService.logAllCronJobs();
+  }
+  @Get('noti/send')
+  sendNot() {
+    return this.notificationService.sendNotification(
+      ['ExponentPushToken[R8qZFFCOxl84OBOnpsUOt1]'],
+      'From ur lover',
+      'i love u so much!',
+      { url: 'matchup/02414bf0-fb5d-4704-8d43-36560a4b80fe' },
+    );
   }
 }
