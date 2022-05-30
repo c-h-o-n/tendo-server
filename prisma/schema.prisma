@@ -2,6 +2,7 @@
 // LATER change more convenient naming convention
 
 // CHECK better naming for PushToken table
+// FIXME add scores to somewhere
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
@@ -18,6 +19,8 @@ model Match {
   teamBId                  String            @db.Uuid
   mvpId                    String?           @db.Uuid
   status                   MatchStatus
+  teamAScore               Int
+  teamBScore               Int
   datetime                 DateTime          @db.Timestamp(6)
   createdAt                DateTime          @default(now()) @db.Timestamp(6)
   updatedAt                DateTime          @db.Timestamp(6)
