@@ -38,11 +38,13 @@ export class MatchController {
       id: match.id,
       status: match.status,
       datetime: match.datetime,
+      teamAScore: match.teamAScore,
       teamA: {
         id: match.Team_Match_teamAIdToTeam.id,
         location: match.Team_Match_teamAIdToTeam.location,
         name: match.Team_Match_teamAIdToTeam.name,
         logoUrl: match.Team_Match_teamAIdToTeam.logoUrl,
+
         members: match.Team_Match_teamAIdToTeam.TeamMember.map((member) => ({
           id: member.User.id,
           username: member.User.username,
@@ -51,6 +53,7 @@ export class MatchController {
           role: member.role,
         })),
       },
+      teamBScore: match.teamBScore,
       teamB: {
         id: match.Team_Match_teamBIdToTeam.id,
         location: match.Team_Match_teamBIdToTeam.location,

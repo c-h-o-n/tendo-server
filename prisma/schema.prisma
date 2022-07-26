@@ -1,8 +1,8 @@
 // LATER make updateAt automaticly up-to-date by triggers
 // LATER change more convenient naming convention
+// LATER Reset changelog both on both side
 
 // CHECK better naming for PushToken table
-// FIXME add scores to somewhere
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
