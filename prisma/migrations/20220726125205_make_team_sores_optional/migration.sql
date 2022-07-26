@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Match" ALTER COLUMN "teamAScore" DROP NOT NULL,
+ALTER COLUMN "teamBScore" DROP NOT NULL;

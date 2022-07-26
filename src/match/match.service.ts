@@ -12,6 +12,7 @@ export class MatchService {
       data: {
         teamAId: data.teamAId,
         teamBId: data.teamBId,
+
         datetime: new Date(data.datetime),
         status: 'scheduled',
         updatedAt: new Date(),

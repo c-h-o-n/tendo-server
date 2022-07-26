@@ -19,8 +19,8 @@ model Match {
   teamBId                  String            @db.Uuid
   mvpId                    String?           @db.Uuid
   status                   MatchStatus
-  teamAScore               Int
-  teamBScore               Int
+  teamAScore               Int?
+  teamBScore               Int?
   datetime                 DateTime          @db.Timestamp(6)
   createdAt                DateTime          @default(now()) @db.Timestamp(6)
   updatedAt                DateTime          @db.Timestamp(6)
@@ -182,6 +182,7 @@ model PushToken {
   pushToken String @db.VarChar(41)
 
   User User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@id([userId, pushToken])
 }
 
