@@ -31,6 +31,7 @@ export class MatchController {
     return createdMatch;
   }
 
+  // LATER WTF are these ? find better solution !
   @Get(':id')
   async getMatch(@Param('id') id: string) {
     const match = await this.matchService.getMatch(id);
