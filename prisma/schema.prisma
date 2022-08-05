@@ -195,7 +195,7 @@ enum FriendshipStatus {
 
 enum MatchStatus {
   scheduled
-  ongoing
+  pending
   completed
   canceled
 }
