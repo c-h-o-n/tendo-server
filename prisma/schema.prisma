@@ -5,7 +5,7 @@
 // CHECK better naming for PushToken table
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
+  previewFeatures = ["fullTextSearch", "interactiveTransactions"]
 }
 
 datasource db {

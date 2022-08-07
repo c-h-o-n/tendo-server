@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Match } from '@prisma/client';
+import { sensitiveHeaders } from 'http2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 
@@ -139,14 +140,27 @@ export class MatchService {
   }
 
   async updateMatch(id: string, data: Partial<Match>, user: any) {
-    return await this.prisma.match.update({
-      where: {
-        id: id,
-      },
-      data: {
-        updatedAt: new Date(),
-        ...data,
-      },
+    return await this.prisma.$transaction(async (prisma) => {
+      const match = await prisma.match.update({
+        where: {
+          id: id,
+        },
+        data: {
+          updatedAt: new Date(),
+          ...data,
+        },
+      });
+
+      if (match.teamAScore && match.teamBScore) {
+        await prisma.match.update({
+          where: {
+            id: id,
+          },
+          data: {
+            status: 'completed',
+          },
+        });
+      }
     });
   }
 
