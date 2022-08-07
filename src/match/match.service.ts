@@ -107,8 +107,8 @@ export class MatchService {
   async getFixturesByUserId(userId: string) {
     return await this.prisma.match.findMany({
       where: {
-        datetime: {
-          gt: new Date(),
+        status: {
+          notIn: ['canceled', 'completed'],
         },
         OR: [
           {
