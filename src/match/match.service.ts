@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Match } from '@prisma/client';
-import { sensitiveHeaders } from 'http2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 

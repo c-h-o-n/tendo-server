@@ -25,12 +25,17 @@ type MatchDetails = Match & {
 
 @Injectable()
 export class CronService {
-  constructor(private schedulerRegistry: SchedulerRegistry, private notificationService: NotificationService) {}
+  constructor(
+    private schedulerRegistry: SchedulerRegistry,
+    private notificationService: NotificationService,
+    private matchService: MatchService,
+  ) {}
 
   async addCronJob(matchDetails: MatchDetails, participantsPushTokens: string[]) {
     try {
       const cronJob = new CronJob(matchDetails.datetime, () => {
         console.log('added cronjob works', matchDetails.id);
+        this.matchService.updateMatch(matchDetails.id, { status: 'pending' }, null);
         this.notificationService.sendNotification(
           participantsPushTokens,
           `${matchDetails.Team_Match_teamAIdToTeam.name} - ${matchDetails.Team_Match_teamBIdToTeam.name}`,
