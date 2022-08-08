@@ -159,6 +159,50 @@ export class MatchService {
             status: 'completed',
           },
         });
+
+        if (match.teamAScore > match.teamBScore) {
+          await prisma.team.update({
+            where: {
+              id: match.teamAId,
+            },
+            data: {
+              wins: {
+                increment: 1,
+              },
+            },
+          });
+          await prisma.team.update({
+            where: {
+              id: match.teamBId,
+            },
+            data: {
+              loses: {
+                increment: 1,
+              },
+            },
+          });
+        } else {
+          await prisma.team.update({
+            where: {
+              id: match.teamAId,
+            },
+            data: {
+              loses: {
+                increment: 1,
+              },
+            },
+          });
+          await prisma.team.update({
+            where: {
+              id: match.teamBId,
+            },
+            data: {
+              wins: {
+                increment: 1,
+              },
+            },
+          });
+        }
       }
     });
   }
