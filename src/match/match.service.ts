@@ -160,49 +160,29 @@ export class MatchService {
           },
         });
 
-        if (match.teamAScore > match.teamBScore) {
-          await prisma.team.update({
-            where: {
-              id: match.teamAId,
+        // increment wins
+        await prisma.team.update({
+          where: {
+            id: match.teamAScore > match.teamBScore ? match.teamAId : match.teamBId,
+          },
+          data: {
+            wins: {
+              increment: 1,
             },
-            data: {
-              wins: {
-                increment: 1,
-              },
+          },
+        });
+
+        // increment loses
+        await prisma.team.update({
+          where: {
+            id: match.teamAScore < match.teamBScore ? match.teamAId : match.teamBId,
+          },
+          data: {
+            loses: {
+              increment: 1,
             },
-          });
-          await prisma.team.update({
-            where: {
-              id: match.teamBId,
-            },
-            data: {
-              loses: {
-                increment: 1,
-              },
-            },
-          });
-        } else {
-          await prisma.team.update({
-            where: {
-              id: match.teamAId,
-            },
-            data: {
-              loses: {
-                increment: 1,
-              },
-            },
-          });
-          await prisma.team.update({
-            where: {
-              id: match.teamBId,
-            },
-            data: {
-              wins: {
-                increment: 1,
-              },
-            },
-          });
-        }
+          },
+        });
       }
     });
   }
