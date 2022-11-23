@@ -4,7 +4,6 @@ import { Match, PushToken, Team, TeamMember, User } from '@prisma/client';
 import { CronJob } from 'cron';
 import { MatchService } from 'src/match/match.service';
 import { NotificationService } from 'src/notification/notification.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 type MatchDetails = Match & {
   Team_Match_teamAIdToTeam: Team & {
